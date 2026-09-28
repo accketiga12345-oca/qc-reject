@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Borang Reject QC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<style>
+  :root{
+    --ink:#1c1f1e;
+    --ink-soft:#5b5f5c;
+    --paper:#f3f1ea;
+    --card:#ffffff;
+    --line:#dcd8cc;
+    --rust:#c1441f;
+    --rust-dark:#8f3116;
+    --rust-fill:#fbeae4;
+    --steel:#3d5a63;
+    --steel-fill:#e8eff0;
+    --ok:#3b6d11;
+    --ok-fill:#eaf3de;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    padding:0 0 60px;
+  }
+  .wrap{max-width:520px;margin:0 auto;padding:0 16px;}
+  header{
+    padding:28px 16px 18px;
+    background:var(--ink);
+    color:var(--paper);
+  }
+  header .inner{max-width:520px;margin:0 auto;}
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:#c9c4b4;
+  }
+  h1{
+    font-family:'Barlow Condensed',sans-serif;
+    font-weight:700;
+    font-size:34px;
+    letter-spacing:.01em;
+    margin:2px 0 0;
+    line-height:1;
+  }
+  h1 span{color:var(--rust);}
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:18px;
+    margin-top:16px;
+  }
+  .section-label{
+    font-family:'Barlow Condensed',sans-serif;
+    font-weight:600;
+    font-size:18px;
+    letter-spacing:.02em;
+    margin:0 0 12px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .section-label .num{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    background:var(--ink);
+    color:var(--paper);
+    border-radius:50%;
+    width:20px;height:20px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  button{font-family:'Inter',sans-serif;cursor:pointer;}
+  .btn-scan{
+    width:100%;
+    padding:16px;
+    border:none;
+    border-radius:var(--radius);
+    background:var(--steel);
+    color:#fff;
+    font-size:16px;
+    font-weight:600;
+    display:flex;align-items:center;justify-content:center;gap:8px;
+  }
+  .btn-scan:active{transform:scale(.98);}
+  .btn-secondary{
+    width:100%;
+    padding:12px;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    background:#fff;
+    color:var(--ink);
+    font-size:14px;
+    font-weight:500;
+    margin-top:10px;
+  }
+  #reader{
+    margin-top:12px;
+    border-radius:var(--radius);
+    overflow:hidden;
+    border:1px solid var(--line);
+    display:none;
+  }
+  #pasteBox{
+    margin-top:10px;
+    font-family:'JetBrains Mono',monospace;
+  }
+  .tag{
+    margin-top:16px;
+    border:2px dashed var(--line);
+    border-radius:var(--radius);
+    padding:14px;
+    display:none;
+  }
+  .tag.filled{display:block;border-color:var(--steel);}
+  .tag-head{
+    display:flex;justify-content:space-between;align-items:center;
+    margin-bottom:10px;
+  }
+  .tag-head .label{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--steel);
+    font-weight:600;
+  }
+  .badge{
+    font-family:'JetBrains Mono',monospace;
+    font-size:10px;
+    background:var(--steel-fill);
+    color:var(--steel);
+    padding:3px 8px;
+    border-radius:20px;
+  }
+  .tag-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px 14px;
+  }
+  .tag-item{}
+  .tag-item .k{font-size:11px;color:var(--ink-soft);margin:0 0 2px;}
+  .tag-item .v{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:600;margin:0;word-break:break-word;}
+  .field{margin-bottom:14px;}
+  .field label{
+    display:block;
+    font-size:13px;
+    font-weight:500;
+    margin-bottom:5px;
+    color:var(--ink);
+  }
+  .field .hint{font-size:11px;color:var(--ink-soft);font-weight:400;}
+  input[type=text],input[type=number],input[type=date],select,textarea{
+    width:100%;
+    padding:10px 12px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    font-size:15px;
+    font-family:'Inter',sans-serif;
+    background:#fff;
+    color:var(--ink);
+  }
+  input:focus,select:focus,textarea:focus{outline:2px solid var(--steel);outline-offset:1px;}
+  .tba-row{display:flex;align-items:center;gap:8px;margin-top:6px;}
+  .tba-row input[type=checkbox]{width:16px;height:16px;}
+  .tba-row label{font-size:12px;color:var(--ink-soft);margin:0;}
+  .err{color:var(--rust-dark);font-size:12px;margin-top:4px;display:none;}
+  .btn-submit{
+    width:100%;
+    padding:16px;
+    border:none;
+    border-radius:var(--radius);
+    background:var(--rust);
+    color:#fff;
+    font-size:17px;
+    font-weight:700;
+    font-family:'Barlow Condensed',sans-serif;
+    letter-spacing:.03em;
+    text-transform:uppercase;
+    margin-top:6px;
+  }
+  .btn-submit:active{transform:scale(.98);}
+  .toast{
+    display:none;
+    background:var(--ok-fill);
+    color:var(--ok);
+    border-radius:8px;
+    padding:10px 14px;
+    font-size:13px;
+    font-weight:500;
+    margin-top:12px;
+  }
+  .log-row{
+    border-bottom:1px solid var(--line);
+    padding:12px 0;
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .log-row:last-child{border-bottom:none;}
+  .log-main .os{font-family:'JetBrains Mono',monospace;font-weight:600;font-size:13px;}
+  .log-main .meta{font-size:12px;color:var(--ink-soft);margin-top:2px;}
+  .log-del{
+    background:none;border:none;color:var(--rust);font-size:12px;font-weight:600;padding:4px;
+  }
+  .empty{color:var(--ink-soft);font-size:13px;text-align:center;padding:20px 0;}
+  .toolbar{display:flex;gap:10px;margin-top:14px;}
+  .toolbar button{flex:1;}
+  .count-pill{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    background:var(--rust-fill);
+    color:var(--rust-dark);
+    padding:2px 9px;
+    border-radius:20px;
+  }
+
+  .runs{margin-top:14px;padding-top:14px;border-top:1px solid var(--line);}
+  .runs-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;}
+  .runs-head .k{font-size:11px;color:var(--ink-soft);margin:0;}
+  .runs-actions{display:flex;gap:6px;flex-wrap:wrap;}
+  .chip{
+    border:1px solid var(--line);background:#fff;color:var(--ink);
+    border-radius:20px;padding:0 12px;min-height:34px;
+    font-size:12px;font-weight:500;
+  }
+  .run-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+  .chip.run{
+    min-height:40px;min-width:48px;padding:0 12px;border-radius:8px;
+    font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:600;
+  }
+  .chip.run.on{background:var(--steel);border-color:var(--steel);color:#fff;}
+  .chip.run.done{border-style:dashed;border-color:var(--rust);color:var(--rust-dark);}
+  .chip.run.on.done{color:#fff;}
+  .chip.run .run-b{font-family:'Inter',sans-serif;font-size:9px;font-weight:600;margin-left:5px;opacity:.85;}
+  .runs-note{font-size:12px;color:var(--ink-soft);margin-top:10px;}
+  .runs-note b{color:var(--ink);}
+  .run-add{display:flex;gap:8px;margin-top:12px;}
+  .run-add input{flex:1;font-family:'JetBrains Mono',monospace;}
+  .run-add .chip{min-height:44px;padding:0 16px;border-radius:8px;}
+  .btn-wa{
+    width:100%;padding:15px;border:none;border-radius:var(--radius);
+    background:#1f8f4e;color:#fff;font-size:16px;font-weight:600;margin-top:10px;
+  }
+  .btn-wa:active{transform:scale(.98);}
+  .scan-hint{font-size:11px;color:var(--ink-soft);margin:12px 0 0;line-height:1.5;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="inner">
+    <div class="eyebrow">QC floor tool</div>
+    <h1>Borang <span>Reject</span></h1>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="card">
+    <p class="section-label"><span class="num">1</span>Scan barcode OS</p>
+    <button class="btn-scan" id="scanBtn"><i>&#128247;</i> Buka kamera & scan</button>
+    <div id="reader"></div>
+    <button class="btn-secondary" id="pasteToggle">Tiada kamera? Taip nombor barcode manual</button>
+    <input type="text" id="pasteBox" inputmode="numeric" placeholder="cth: 2604340054 atau 26043400540023" style="display:none;margin-top:10px;font-family:'JetBrains Mono',monospace;">
+    <button class="btn-secondary" id="parseBtn" style="display:none;">Cari running no</button>
+    <p class="scan-hint">Nak reject banyak sekali gus: taip 10 digit pertama (tahun + OS + item) untuk dapat senarai semua running no, kemudian pilih yang nak reject. Atau scan barcode satu-satu, setiap scan akan ditambah ke pilihan.</p>
+
+    <div id="manualMat" style="display:none;margin-top:14px;">
+      <div class="field">
+        <label>Material description <span class="hint">Orca tak jumpa, isi manual</span></label>
+        <input type="text" id="f_matdesc" placeholder="cth: SS FITTINGS (304-2B-COATING)">
+      </div>
+      <div class="field">
+        <label>THK</label>
+        <input type="text" id="f_thk" placeholder="cth: 0.9">
+      </div>
+    </div>
+
+    <div class="tag" id="tag">
+      <div class="tag-head">
+        <span class="label">Data auto</span>
+        <span class="badge" id="tagBadge">belum scan</span>
+      </div>
+      <div class="tag-grid">
+        <div class="tag-item"><p class="k">OS NO</p><p class="v" id="v_os">-</p></div>
+        <div class="tag-item"><p class="k">Item</p><p class="v" id="v_item">-</p></div>
+        <div class="tag-item"><p class="k">Status</p><p class="v" id="v_status">-</p></div>
+        <div class="tag-item" style="grid-column:1/-1;"><p class="k">Material</p><p class="v" id="v_material">-</p></div>
+      </div>
+
+      <div class="runs" id="runsBox" style="display:none;">
+        <div class="runs-head">
+          <p class="k" id="runsTitle">Running no</p>
+          <div class="runs-actions">
+            <button type="button" class="chip" id="runAll">Pilih semua</button>
+            <button type="button" class="chip" id="runNew">Belum reject</button>
+            <button type="button" class="chip" id="runNone">Kosongkan</button>
+          </div>
+        </div>
+        <div class="run-grid" id="runGrid"></div>
+        <div class="runs-note" id="runsNote"></div>
+        <div class="err" id="err_runs">Pilih sekurang-kurangnya satu running no.</div>
+        <div class="run-add">
+          <input type="text" id="runAddInput" placeholder="Tambah manual: 12 atau 5-9">
+          <button type="button" class="chip" id="runAddBtn">Tambah</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <p class="section-label"><span class="num">2</span>Butiran reject (isi manual)</p>
+
+    <div class="field">
+      <label>Reason</label>
+      <input type="text" id="f_reason" placeholder="cth: Mechanical damage (dented)">
+      <div class="err" id="err_reason">Sila isi reason.</div>
+    </div>
+
+    <div class="field">
+      <label>All Qty <span class="hint">contoh: 1 full body only</span></label>
+      <input type="text" id="f_qty" placeholder="1 full body only">
+      <div class="err" id="err_qty">Sila isi qty.</div>
+    </div>
+
+    <div class="field">
+      <label>M&sup2; per pcs <span class="hint">isi "-" jika tiada</span></label>
+      <input type="text" id="f_m2" placeholder="-">
+    </div>
+
+    <div class="field">
+      <label>Location found</label>
+      <select id="f_locfound">
+        <option value="">Pilih location...</option>
+        <option>Laser</option>
+        <option>Forming</option>
+        <option>Welding</option>
+        <option>Sandblast</option>
+        <option>Washing 1</option>
+        <option>Coating</option>
+        <option>QC</option>
+        <option>Packing</option>
+        <option>Logistic</option>
+        <option>Production</option>
+      </select>
+      <div class="err" id="err_locfound">Sila pilih location found.</div>
+    </div>
+
+    <div class="field">
+      <label>Error location</label>
+      <select id="f_locerror">
+        <option value="">Pilih location...</option>
+        <option>Laser</option>
+        <option>Forming</option>
+        <option>Welding</option>
+        <option>Sandblast</option>
+        <option>Washing 1</option>
+        <option>Coating</option>
+        <option>QC</option>
+        <option>Packing</option>
+        <option>Logistic</option>
+        <option>Production</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Shipment date</label>
+      <input type="date" id="f_shipdate">
+      <div class="tba-row">
+        <input type="checkbox" id="f_tba" checked>
+        <label for="f_tba">TBA (belum tentu)</label>
+      </div>
+    </div>
+
+    <button class="btn-submit" id="submitBtn">Tambah ke rekod reject</button>
+    <div class="toast" id="toast">Rekod ditambah.</div>
+  </div>
+
+  <div class="card">
+    <p class="section-label">Ringkasan</p>
+    <pre id="summaryText" style="white-space:pre-wrap;word-break:break-word;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.7;background:var(--paper);padding:12px;border-radius:8px;border:1px solid var(--line);margin:0;">-</pre>
+    <button class="btn-wa" id="waBtn">Hantar ke WhatsApp</button>
+    <button class="btn-secondary" id="copyBtn">📋 Copy sahaja</button>
+  </div>
+
+  <div class="card">
+    <p class="section-label"><span class="num">3</span>Rekod reject hari ini <span class="count-pill" id="countPill">0</span></p>
+    <div id="logList"><div class="empty">Belum ada rekod lagi.</div></div>
+    <div class="toolbar">
+      <button class="btn-secondary" id="exportBtn">Export CSV</button>
+      <button class="btn-secondary" id="clearBtn">Kosongkan rekod</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* =====================================================================
+   BARIS '@' KOSONG DI HUJUNG MESEJ WHATSAPP
+   QC tinggal tap setiap '@' dan pilih nama dari senarai WhatsApp.
+   Tukar nombor ini kalau nak lebih / kurang baris.
+   ===================================================================== */
+const TAG_LINES = 4;
+
+let scanner = null;
+let scannedData = { os:'', item:'', prefix:'' };
+let runList = [];          // [{ code, run }] semua running no bawah item ini
+let runSel = new Set();    // code yang dipilih untuk reject
+let materialData = { status:'', material:'' };
+const STORAGE_KEY = 'qc_reject_log_v1';
+
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+function todayISO(){
+  const d = new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function todayDisplay(){
+  const d = new Date();
+  return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();
+}
+function formatDateInput(iso){
+  if (!iso) return '';
+  const parts = iso.split('-');
+  if (parts.length !== 3) return iso;
+  const [y,m,d] = parts;
+  return d + '/' + m + '/' + y;
+}
+
+// Format barcode: YY(2) + OS(4) + item(4) + running(4).
+// 10 digit pertama = item. 4 digit terakhir = running no setiap pcs.
+function parseBarcodeDigits(raw){
+  const digits = (raw || '').replace(/\D/g,'');
+  if (digits.length < 10) return null;
+  return {
+    digits: digits,
+    prefix: digits.slice(0,10),
+    os: 'OS-AT' + digits.slice(0,6),
+    item: String(parseInt(digits.slice(6,10),10)),
+    run: digits.length >= 14 ? String(parseInt(digits.slice(10,14),10)) : ''
+  };
+}
+
+function parseMaterialDescription(text){
+  const m = (text || '').match(/\(([^)]+)\)/);
+  if (!m) return { status:'', material:'' };
+  const parts = m[1].split('-').map(s => s.trim()).filter(Boolean);
+  if (!parts.length) return { status:'', material:'' };
+  const statusRaw = parts[parts.length - 1].toLowerCase();
+  const status = statusRaw.charAt(0).toUpperCase() + statusRaw.slice(1);
+  const gradeParts = parts.slice(0, -1);
+  const material = gradeParts.length ? 'SS ' + gradeParts.join(' ') : '';
+  return { status, material };
+}
+
+const ORCA_SHEET_URL = 'https://qc-reject-orca-proxy.accketiga12345.workers.dev/';
+
+function updateTagBadge(text){
+  const hasBarcode = !!scannedData.os;
+  document.getElementById('tag').classList.toggle('filled', hasBarcode);
+  document.getElementById('tagBadge').textContent = text || (hasBarcode ? 'scan berjaya' : 'belum scan');
+}
+
+function showManualMat(show){
+  document.getElementById('manualMat').style.display = show ? 'block' : 'none';
+}
+
+async function fetchOrcaRows(){
+  const res = await fetch(ORCA_SHEET_URL);
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  const json = await res.json();
+  return Array.isArray(json) ? json : (json.data || json.items || json.rows || []);
+}
+const rowBarcode = r => String(r['Barcode'] || '').trim();
+
+/* ---------- senarai running no ---------- */
+function runFromCode(code){
+  const tail = code.slice(10), n = parseInt(tail,10);
+  return isNaN(n) ? tail : String(n);
+}
+function addRun(code, select){
+  if (!runList.some(r => r.code === code)) runList.push({ code: code, run: runFromCode(code) });
+  if (select) runSel.add(code);
+}
+function sortRuns(){
+  runList.sort((a,b) => a.code.localeCompare(b.code, undefined, { numeric:true }));
+}
+function loggedRuns(){
+  return new Set(loadLog()
+    .filter(r => r.os === scannedData.os && r.item === scannedData.item)
+    .map(r => String(r.running)));
+}
+function selectedRuns(){
+  return runList.filter(r => runSel.has(r.code));
+}
+
+function renderRuns(){
+  const box = document.getElementById('runsBox');
+  if (!scannedData.prefix){ box.style.display = 'none'; return; }
+  box.style.display = 'block';
+  const logged = loggedRuns();
+  document.getElementById('runsTitle').textContent =
+    'Running no bawah ' + scannedData.prefix + ' (' + runList.length + ' pcs)';
+  document.getElementById('runGrid').innerHTML = runList.length
+    ? runList.map(r => {
+        const on = runSel.has(r.code), done = logged.has(String(r.run));
+        return '<button type="button" class="chip run' + (on ? ' on' : '') + (done ? ' done' : '') +
+          '" data-code="' + esc(r.code) + '" title="' + esc(r.code) + '">' + esc(r.run) +
+          (done ? '<span class="run-b">REJ</span>' : '') + '</button>';
+      }).join('')
+    : '<div class="empty" style="padding:8px 0;">Tiada running no dijumpai. Tambah manual di bawah.</div>';
+  const n = runSel.size;
+  const nDone = runList.filter(r => logged.has(String(r.run))).length;
+  document.getElementById('runsNote').innerHTML =
+    '<b>' + n + '</b> dipilih' +
+    (n > 1 ? ', satu rekod reject akan disimpan untuk setiap pcs.' : '.') +
+    (nDone ? ' ' + nDone + ' pcs dah ada dalam rekod (garis putus-putus).' : '');
+  if (n) showError('err_runs', false);
+}
+
+document.getElementById('runGrid').addEventListener('click', (e) => {
+  const b = e.target.closest('.chip.run');
+  if (!b) return;
+  const code = b.getAttribute('data-code');
+  if (runSel.has(code)) runSel.delete(code); else runSel.add(code);
+  renderRuns(); updateSummary();
+});
+document.getElementById('runAll').addEventListener('click', () => {
+  runList.forEach(r => runSel.add(r.code));
+  renderRuns(); updateSummary();
+});
+document.getElementById('runNew').addEventListener('click', () => {
+  const logged = loggedRuns();
+  runSel = new Set(runList.filter(r => !logged.has(String(r.run))).map(r => r.code));
+  renderRuns(); updateSummary();
+});
+document.getElementById('runNone').addEventListener('click', () => {
+  runSel.clear();
+  renderRuns(); updateSummary();
+});
+
+function addManualRuns(){
+  if (!scannedData.prefix) return;
+  const inp = document.getElementById('runAddInput');
+  let added = 0;
+  inp.value.split(/[,\s]+/).filter(Boolean).forEach(p => {
+    const m = p.match(/^(\d{1,4})(?:-(\d{1,4}))?$/);
+    if (!m) return;
+    let a = parseInt(m[1],10), b = m[2] ? parseInt(m[2],10) : a;
+    if (b < a){ const t = a; a = b; b = t; }
+    for (let n = a; n <= b; n++){ addRun(scannedData.prefix + String(n).padStart(4,'0'), true); added++; }
+  });
+  if (!added){ updateTagBadge('format tak sah, cth: 12 atau 5-9'); return; }
+  sortRuns();
+  inp.value = '';
+  renderRuns(); updateSummary();
+}
+document.getElementById('runAddBtn').addEventListener('click', addManualRuns);
+document.getElementById('runAddInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') addManualRuns(); });
+
+/* ---------- scan / cari ---------- */
+function manualFallback(parsed, badge){
+  runList = []; runSel = new Set();
+  if (parsed.run) addRun(parsed.digits.slice(0,14), true);
+  showManualMat(true);
+  updateTagBadge(badge);
+  renderRuns(); updateSummary();
+}
+
+async function applyScanned(barcodeText){
+  const parsed = parseBarcodeDigits(barcodeText);
+  if (!parsed){
+    alert('Nombor barcode tak sah. Perlu sekurang-kurangnya 10 digit (tahun + OS + item), atau 14 digit penuh.');
+    return;
+  }
+
+  // Item sama dah dibuka: scan lagi = tambah running no tu ke pilihan.
+  if (runList.length && parsed.prefix === scannedData.prefix){
+    if (parsed.run){
+      addRun(parsed.digits.slice(0,14), true);
+      sortRuns();
+      renderRuns(); updateSummary();
+      updateTagBadge('running ' + parsed.run + ' ditambah ke pilihan');
+    } else {
+      updateTagBadge('item ni dah dibuka, pilih running no di bawah');
+    }
+    return;
+  }
+
+  scannedData = { os: parsed.os, item: parsed.item, prefix: parsed.prefix };
+  runList = []; runSel = new Set();
+  document.getElementById('f_matdesc').value = '';
+  document.getElementById('f_thk').value = '';
+  showManualMat(false);
+  document.getElementById('v_os').textContent = parsed.os;
+  document.getElementById('v_item').textContent = parsed.item;
+  refreshMaterialFields();
+  updateTagBadge('mencari di orca...');
+  renderRuns();
+  updateSummary();
+
+  try {
+    const rows = await fetchOrcaRows();
+    const matches = rows.filter(r => rowBarcode(r).startsWith(parsed.prefix));
+    if (!matches.length){
+      manualFallback(parsed, 'tiada padanan di orca, isi material manual');
+      return;
+    }
+    matches.forEach(r => addRun(rowBarcode(r), false));
+    if (parsed.run) addRun(parsed.digits.slice(0,14), true);   // barcode penuh = terus pilih pcs tu
+    sortRuns();
+    const info = matches.find(r => r['MATERIAL DESCRIPTION']) || matches[0];
+    const matdesc = info['MATERIAL DESCRIPTION'] || '';
+    document.getElementById('f_matdesc').value = matdesc;
+    document.getElementById('f_thk').value = info['THK'] != null ? String(info['THK']) : '';
+    showManualMat(!matdesc);
+    refreshMaterialFields();
+    updateTagBadge('scan berjaya (auto dari orca), ' + runList.length + ' running no');
+    renderRuns();
+  } catch(e){
+    manualFallback(parsed, 'gagal sambung orca: ' + e.message);
+    console.error('Orca lookup error:', e);
+  }
+  updateSummary();
+}
+
+function refreshMaterialFields(){
+  const thk = document.getElementById('f_thk').value.trim();
+  materialData = parseMaterialDescription(document.getElementById('f_matdesc').value);
+  document.getElementById('v_status').textContent = materialData.status || '-';
+  document.getElementById('v_material').textContent = materialData.material ? (materialData.material + (thk ? ' ' + thk : '')) : '-';
+}
+document.getElementById('f_matdesc').addEventListener('input', () => { refreshMaterialFields(); updateSummary(); });
+document.getElementById('f_thk').addEventListener('input', () => { refreshMaterialFields(); updateSummary(); });
+
+// Contoh: item 54, running 1-5 dan 8  ->  "54-1 to 54-5, 54-8"
+function formatItemLine(){
+  const item = scannedData.item;
+  if (!item) return '-';
+  const all = selectedRuns().map(r => r.run);
+  const nums = all.map(Number).filter(n => !isNaN(n)).sort((a,b) => a-b);
+  const other = all.filter(r => isNaN(Number(r)));
+  const parts = [];
+  let i = 0;
+  while (i < nums.length){
+    let j = i;
+    while (j + 1 < nums.length && nums[j+1] === nums[j] + 1) j++;
+    if (j - i + 1 >= 3) parts.push(item + '-' + nums[i] + ' to ' + item + '-' + nums[j]);
+    else for (let k = i; k <= j; k++) parts.push(item + '-' + nums[k]);
+    i = j + 1;
+  }
+  other.forEach(r => parts.push(item + '-' + r));
+  return parts.length ? parts.join(', ') : item;
+}
+
+function buildSummary(){
+  const reason = document.getElementById('f_reason').value.trim();
+  const os = scannedData.os || '-';
+  const item = formatItemLine();
+  const qty = document.getElementById('f_qty').value.trim() || '-';
+  const m2 = document.getElementById('f_m2').value.trim() || '-';
+  const status = materialData.status || '-';
+  const locfound = document.getElementById('f_locfound').value || '-';
+  const locerror = document.getElementById('f_locerror').value || '-';
+  const thk = document.getElementById('f_thk').value.trim();
+  const material = materialData.material ? (materialData.material + (thk ? ' ' + thk : '')) : '-';
+  const date = todayDisplay();
+  const tba = document.getElementById('f_tba').checked;
+  const shipdate = tba ? 'TBA' : (formatDateInput(document.getElementById('f_shipdate').value) || 'TBA');
+
+  return [
+    'Reason: ' + (reason || '-'),
+    'OS NO: ' + os,
+    'Item: ' + item,
+    'All Qty: ' + qty,
+    'M² per pcs: ' + m2,
+    'Status: ' + status,
+    'Location found: ' + locfound,
+    'Error Location: ' + locerror,
+    'Material: ' + material,
+    'Date: ' + date,
+    'Shipment Date: ' + shipdate
+  ].join('\n');
+}
+
+/* ---------- baris @ kosong untuk tag manual ---------- */
+function tagLine(){
+  return TAG_LINES > 0 ? '\n\n' + Array(TAG_LINES).fill('@').join('\n') : '';
+}
+
+let submittedBody = null;   // lepas submit, ringkasan kekal sampai borang diisi semula
+function renderSummary(){
+  const body = submittedBody !== null ? submittedBody : buildSummary();
+  document.getElementById('summaryText').textContent = body + tagLine();
+}
+function updateSummary(){
+  submittedBody = null;
+  renderSummary();
+}
+
+document.getElementById('waBtn').addEventListener('click', () => {
+  const text = document.getElementById('summaryText').textContent;
+  if (!text.trim() || text.trim() === '-') { alert('Belum ada ringkasan untuk dihantar.'); return; }
+  window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+});
+
+['f_reason','f_qty','f_m2','f_locfound','f_locerror','f_shipdate'].forEach(id => {
+  document.getElementById(id).addEventListener('input', updateSummary);
+  document.getElementById(id).addEventListener('change', updateSummary);
+});
+document.getElementById('f_tba').addEventListener('change', updateSummary);
+
+document.getElementById('copyBtn').addEventListener('click', () => {
+  const text = document.getElementById('summaryText').textContent;
+  const done = () => {
+    const btn = document.getElementById('copyBtn');
+    const original = btn.textContent;
+    btn.textContent = '✅ Disalin!';
+    setTimeout(() => { btn.textContent = original; }, 1500);
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(done).catch(() => {
+      alert('Gagal copy. Sila copy manual.');
+    });
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); done(); } catch(e){ alert('Gagal copy. Sila copy manual.'); }
+    document.body.removeChild(ta);
+  }
+});
+
+document.getElementById('scanBtn').addEventListener('click', () => {
+  const readerDiv = document.getElementById('reader');
+  if (scanner) {
+    scanner.stop().then(()=>{ scanner=null; readerDiv.style.display='none'; document.getElementById('scanBtn').textContent = '📷 Buka kamera & scan'; });
+    return;
+  }
+  readerDiv.style.display = 'block';
+  document.getElementById('scanBtn').textContent = 'Hentikan kamera';
+  scanner = new Html5Qrcode('reader');
+  scanner.start(
+    { facingMode: 'environment' },
+    { fps: 10, qrbox: 220 },
+    (decodedText) => {
+      applyScanned(decodedText);
+      scanner.stop().then(()=>{ scanner=null; readerDiv.style.display='none'; document.getElementById('scanBtn').textContent = '📷 Buka kamera & scan'; });
+    },
+    () => {}
+  ).catch((err) => {
+    alert('Tak dapat buka kamera. Guna butang "Tampal teks manual" di bawah sebagai ganti.');
+    readerDiv.style.display='none';
+    document.getElementById('scanBtn').textContent = '📷 Buka kamera & scan';
+  });
+});
+
+document.getElementById('pasteToggle').addEventListener('click', () => {
+  const box = document.getElementById('pasteBox');
+  const btn = document.getElementById('parseBtn');
+  const show = box.style.display !== 'block';
+  box.style.display = show ? 'block' : 'none';
+  btn.style.display = show ? 'block' : 'none';
+});
+
+document.getElementById('pasteBox').addEventListener('keydown', (e) => { if (e.key === 'Enter') document.getElementById('parseBtn').click(); });
+
+document.getElementById('parseBtn').addEventListener('click', () => {
+  const text = document.getElementById('pasteBox').value;
+  if (!text.trim()) return;
+  applyScanned(text);
+});
+
+document.getElementById('f_tba').addEventListener('change', (e) => {
+  document.getElementById('f_shipdate').disabled = e.target.checked;
+  if (e.target.checked) document.getElementById('f_shipdate').value = '';
+});
+document.getElementById('f_shipdate').disabled = true;
+
+function loadLog(){
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+  catch(e){ return []; }
+}
+function saveLog(log){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(log));
+}
+function renderLog(){
+  const log = loadLog();
+  const container = document.getElementById('logList');
+  document.getElementById('countPill').textContent = log.length;
+  if (!log.length){
+    container.innerHTML = '<div class="empty">Belum ada rekod lagi.</div>';
+    return;
+  }
+  container.innerHTML = log.slice().reverse().map((r, revIdx) => {
+    const idx = log.length - 1 - revIdx;
+    return `<div class="log-row">
+      <div class="log-main">
+        <div class="os">${esc(r.os || '(tiada OS NO)')} &middot; item ${esc(r.item || '-')} &middot; run ${esc(r.running || '-')}</div>
+        <div class="meta">${esc(r.reason)} &middot; qty ${esc(r.qty)} &middot; ${esc(r.date)}</div>
+      </div>
+      <button class="log-del" data-idx="${idx}">Padam</button>
+    </div>`;
+  }).join('');
+  container.querySelectorAll('.log-del').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const i = parseInt(btn.getAttribute('data-idx'));
+      const log = loadLog();
+      log.splice(i,1);
+      saveLog(log);
+      renderLog();
+    });
+  });
+}
+
+function showError(id, show){
+  document.getElementById(id).style.display = show ? 'block' : 'none';
+}
+
+document.getElementById('submitBtn').addEventListener('click', () => {
+  const reason = document.getElementById('f_reason').value.trim();
+  const qty = document.getElementById('f_qty').value.trim();
+  const locfound = document.getElementById('f_locfound').value.trim();
+  const runs = selectedRuns();
+
+  let ok = true;
+  if (!reason){ showError('err_reason', true); ok = false; } else showError('err_reason', false);
+  if (!qty){ showError('err_qty', true); ok = false; } else showError('err_qty', false);
+  if (!locfound){ showError('err_locfound', true); ok = false; } else showError('err_locfound', false);
+  if (runList.length && !runs.length){ showError('err_runs', true); ok = false; } else showError('err_runs', false);
+  if (!ok) return;
+
+  const tba = document.getElementById('f_tba').checked;
+  const shipdate = tba ? 'TBA' : (formatDateInput(document.getElementById('f_shipdate').value) || 'TBA');
+
+  const thk = document.getElementById('f_thk').value.trim();
+  const base = {
+    reason: reason,
+    os: scannedData.os,
+    item: scannedData.item,
+    qty: qty,
+    m2: document.getElementById('f_m2').value.trim() || '-',
+    status: materialData.status,
+    locfound: locfound,
+    locerror: document.getElementById('f_locerror').value,
+    material: materialData.material ? (materialData.material + (thk ? ' ' + thk : '')) : '',
+    date: todayDisplay(),
+    shipdate: shipdate
+  };
+
+  // Satu rekod untuk setiap running no yang dipilih (butiran reject sama).
+  const pieces = runs.length ? runs.map(r => r.run) : [''];
+  const log = loadLog();
+  pieces.forEach(run => log.push(Object.assign({}, base, { running: run })));
+  saveLog(log);
+  renderLog();
+
+  const submittedSummary = buildSummary();
+
+  const toast = document.getElementById('toast');
+  toast.style.display = 'block';
+  const label = base.os || base.item || '';
+  toast.textContent = pieces.length > 1
+    ? pieces.length + ' rekod ditambah (' + label + ').'
+    : 'Rekod ' + label + ' ditambah.';
+  setTimeout(()=>{ toast.style.display='none'; }, 2500);
+
+  document.getElementById('f_reason').value = '';
+  document.getElementById('f_qty').value = '';
+  document.getElementById('f_m2').value = '';
+  document.getElementById('f_locfound').value = '';
+  document.getElementById('f_locerror').value = '';
+  document.getElementById('f_tba').checked = true;
+  document.getElementById('f_shipdate').value = '';
+  document.getElementById('f_shipdate').disabled = true;
+  document.getElementById('f_matdesc').value = '';
+  document.getElementById('f_thk').value = '';
+  showManualMat(false);
+  document.getElementById('tag').classList.remove('filled');
+  document.getElementById('tagBadge').textContent = 'belum scan';
+  document.getElementById('v_os').textContent='-';
+  document.getElementById('v_item').textContent='-';
+  document.getElementById('v_status').textContent='-';
+  document.getElementById('v_material').textContent='-';
+  document.getElementById('pasteBox').value='';
+  document.getElementById('runAddInput').value='';
+  scannedData = { os:'', item:'', prefix:'' };
+  runList = []; runSel = new Set();
+  materialData = { status:'', material:'' };
+  renderRuns();
+  submittedBody = submittedSummary;
+  renderSummary();
+});
+
+document.getElementById('exportBtn').addEventListener('click', () => {
+  const log = loadLog();
+  if (!log.length){ alert('Tiada rekod untuk export.'); return; }
+  const headers = ['Reason','OS NO','Item','Running No','All Qty','M2 per pcs','Status','Location found','Error Location','Material','Date','Shipment Date'];
+  const rows = log.map(r => [r.reason,r.os,r.item,r.running,r.qty,r.m2,r.status,r.locfound,r.locerror,r.material,r.date,r.shipdate]);
+  const csv = [headers, ...rows].map(row =>
+    row.map(cell => '"' + String(cell || '').replace(/"/g,'""') + '"').join(',')
+  ).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'qc-reject-log-' + todayISO() + '.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+document.getElementById('clearBtn').addEventListener('click', () => {
+  if (confirm('Padam semua rekod reject dalam senarai ni?')){
+    saveLog([]);
+    renderLog();
+  }
+});
+
+renderLog();
+renderRuns();
+updateSummary();
+</script>
+
+</body>
+</html>
